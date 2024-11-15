@@ -6,10 +6,10 @@
     <title>Simple Chat and Code Interface</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-<body>
-
+<body class="dark-theme"> <!-- Apply dark theme by default -->
+    
     <div id="theme-toggle-container">
-        <button id="theme-toggle" onclick="toggleTheme()">Switch Theme</button>
+        <button id="theme-toggle" onclick="toggleTheme()">Switch to Light Theme</button> <!-- Button reflects dark theme currently active -->
     </div>
 
     <h1>Chat and Code Interface</h1>
@@ -18,10 +18,8 @@
         <!-- Code Snippet Input Section -->
         <div id="codebox">
             <h2>Code Snippet</h2>
-            <div id="code-input-container">
-                <textarea id="code-input" placeholder="Enter your Python code here..."></textarea>
-                <button onclick="runCode()">Run Code</button>
-            </div>
+            <textarea id="code-input" placeholder="Enter your Python code here..."></textarea>
+            <button onclick="runCode()">Run Code</button>
         </div>
 
         <!-- Output Section -->
@@ -33,7 +31,16 @@
         <!-- Chatbox Section -->
         <div id="chatbox">
             <h2>Chatbox</h2>
+            
+            <!-- Username Input -->
+            <div id="username-container">
+                <label for="username">Enter your Username:</label>
+                <input type="text" id="username" placeholder="Your username" />
+            </div>
+
             <div id="chat-content"></div>
+
+            <!-- Chat Input and Send Button -->
             <input type="text" id="chat-input" placeholder="Type a message..." />
             <button onclick="sendMessage()">Send Message</button>
         </div>
@@ -43,30 +50,22 @@
         // Function to send a chat message
         async function sendMessage() {
             const chatInput = document.getElementById("chat-input").value.trim();
-            if (chatInput) {
+            const username = document.getElementById("username").value.trim();
+            
+            // Ensure username and message are provided
+            if (chatInput && username) {
                 const chatContent = document.getElementById("chat-content");
 
-                // Display user message
+                // Display user message with username
                 const userEntry = document.createElement("div");
-                userEntry.textContent = "User: " + chatInput;
+                userEntry.textContent = username + ": " + chatInput;
                 userEntry.className = "chat-entry user-message";
                 chatContent.appendChild(userEntry);
 
-                // Fetch model response
-                const response = await fetch("/send_message", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ message: chatInput })
-                });
-                const data = await response.json();
-
-                // Display model's reply
-                const replyEntry = document.createElement("div");
-                replyEntry.textContent = "Model: " + data.reply;
-                replyEntry.className = "chat-entry reply-message";
-                chatContent.appendChild(replyEntry);
-
+                // Clear input field after sending message
                 document.getElementById("chat-input").value = "";
+
+                // Scroll to the bottom of the chat content to show new messages
                 chatContent.scrollTop = chatContent.scrollHeight;
             }
         }
