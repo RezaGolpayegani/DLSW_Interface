@@ -25,7 +25,7 @@
             <h2>Code Snippet</h2>
             <!-- Replace textarea with CodeMirror -->
             <textarea id="code-input" placeholder="Enter your Python code here..."></textarea>
-            <button onclick="runCode()">Run Code</button>
+            <button onclick="runCode()">Tune Parameters</button>
         </div>
 
         <!-- Output Section -->
@@ -90,19 +90,25 @@
         }
 
         // Run the code snippet and show output
+        // Run the code snippet and show output
         async function runCode() {
             const codeInputValue = codeInput.getValue().trim(); // Get value from CodeMirror
             if (codeInputValue) {
-                const response = await fetch("/run_code", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ code: codeInputValue })
-                });
-                const data = await response.json();
-
-                document.getElementById("output-content").textContent = data.output;
+                const prompt = `Tune the parameters in this code:${codeInputValue}`;
+                try {
+                    const response = await fetch("/run_code", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ code: prompt })
+                    });
+                    const data = await response.json();
+                    document.getElementById("output-content").textContent = data.output;
+                } catch (error) {
+                    document.getElementById("output-content").textContent = `Error: ${error.message}`;
+                }
             }
         }
+
 
         // Theme toggle function
         function toggleTheme() {

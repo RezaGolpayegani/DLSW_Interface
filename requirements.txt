@@ -1,0 +1,5 @@
+flask
+llama-stack
+executorch
+torch
+ollama
