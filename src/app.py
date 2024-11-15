@@ -9,7 +9,7 @@ def index():
 @app.route('/send_message', methods=['POST'])
 def send_message():
     message = request.json['message']
-    reply = f"Received: {message}"  # Simulated response
+    # reply = f"Received: {message}"  # Simulated response
     return jsonify({'reply': reply})
 
 @app.route('/run_code', methods=['POST'])

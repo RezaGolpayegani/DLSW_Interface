@@ -3,7 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple Chat and Code Interface</title>
+    <title>Deep-Learning/Machine-Learning Parameter Tuner</title>
+    <!-- Link to CodeMirror's CSS and JS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/theme/dracula.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/python/python.min.js"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body class="dark-theme"> <!-- Apply dark theme by default -->
@@ -12,12 +17,13 @@
         <button id="theme-toggle" onclick="toggleTheme()">Switch to Light Theme</button> <!-- Button reflects dark theme currently active -->
     </div>
 
-    <h1>Chat and Code Interface</h1>
+    <h1>DL/ML Parameter Tuner</h1>
 
     <div id="container">
         <!-- Code Snippet Input Section -->
         <div id="codebox">
             <h2>Code Snippet</h2>
+            <!-- Replace textarea with CodeMirror -->
             <textarea id="code-input" placeholder="Enter your Python code here..."></textarea>
             <button onclick="runCode()">Run Code</button>
         </div>
@@ -47,6 +53,19 @@
     </div>
 
     <script>
+        // Initialize CodeMirror for Python code editing
+        const codeInput = CodeMirror.fromTextArea(document.getElementById("code-input"), {
+            mode: "python",
+            theme: "dracula", // Dark theme for CodeMirror
+            lineNumbers: true, // Show line numbers
+            matchBrackets: true, // Match parentheses
+            autoCloseBrackets: true, // Automatically close brackets
+            styleActiveLine: true, // Highlight active line
+            indentUnit: 4, // Set indent size
+            tabSize: 4, // Tab size
+            lineWrapping: true // Wrap lines
+        });
+
         // Function to send a chat message
         async function sendMessage() {
             const chatInput = document.getElementById("chat-input").value.trim();
@@ -72,12 +91,12 @@
 
         // Run the code snippet and show output
         async function runCode() {
-            const codeInput = document.getElementById("code-input").value.trim();
-            if (codeInput) {
+            const codeInputValue = codeInput.getValue().trim(); // Get value from CodeMirror
+            if (codeInputValue) {
                 const response = await fetch("/run_code", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ code: codeInput })
+                    body: JSON.stringify({ code: codeInputValue })
                 });
                 const data = await response.json();
 
@@ -91,6 +110,14 @@
             const theme = document.body.classList.contains("dark-theme") ? "Dark" : "Light";
             document.getElementById("theme-toggle").innerText = `Switch to ${theme === "Dark" ? "Light" : "Dark"} Theme`;
         }
+
+        // Listen for Enter key press to send a message
+        document.getElementById("chat-input").addEventListener("keydown", function(event) {
+            if (event.key === "Enter") {
+                event.preventDefault(); // Prevent the default action of Enter (which adds a new line)
+                sendMessage(); // Call the sendMessage function
+            }
+        });
     </script>
 </body>
 </html>
