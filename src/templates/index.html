@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Chat and Code Interface</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <div id="theme-toggle-container">
+        <button id="theme-toggle" onclick="toggleTheme()">Switch Theme</button>
+    </div>
+
+    <h1>Chat and Code Interface</h1>
+
+    <div id="container">
+        <!-- Code Snippet Input Section -->
+        <div id="codebox">
+            <h2>Code Snippet</h2>
+            <div id="code-input-container">
+                <textarea id="code-input" placeholder="Enter your Python code here..."></textarea>
+                <button onclick="runCode()">Run Code</button>
+            </div>
+        </div>
+
+        <!-- Output Section -->
+        <div id="output">
+            <h2>Model Output</h2>
+            <pre id="output-content">Your output will appear here.</pre>
+        </div>
+
+        <!-- Chatbox Section -->
+        <div id="chatbox">
+            <h2>Chatbox</h2>
+            <div id="chat-content"></div>
+            <input type="text" id="chat-input" placeholder="Type a message..." />
+            <button onclick="sendMessage()">Send Message</button>
+        </div>
+    </div>
+
+    <script>
+        // Function to send a chat message
+        async function sendMessage() {
+            const chatInput = document.getElementById("chat-input").value.trim();
+            if (chatInput) {
+                const chatContent = document.getElementById("chat-content");
+
+                // Display user message
+                const userEntry = document.createElement("div");
+                userEntry.textContent = "User: " + chatInput;
+                userEntry.className = "chat-entry user-message";
+                chatContent.appendChild(userEntry);
+
+                // Fetch model response
+                const response = await fetch("/send_message", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ message: chatInput })
+                });
+                const data = await response.json();
+
+                // Display model's reply
+                const replyEntry = document.createElement("div");
+                replyEntry.textContent = "Model: " + data.reply;
+                replyEntry.className = "chat-entry reply-message";
+                chatContent.appendChild(replyEntry);
+
+                document.getElementById("chat-input").value = "";
+                chatContent.scrollTop = chatContent.scrollHeight;
+            }
+        }
+
+        // Run the code snippet and show output
+        async function runCode() {
+            const codeInput = document.getElementById("code-input").value.trim();
+            if (codeInput) {
+                const response = await fetch("/run_code", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ code: codeInput })
+                });
+                const data = await response.json();
+
+                document.getElementById("output-content").textContent = data.output;
+            }
+        }
+
+        // Theme toggle function
+        function toggleTheme() {
+            document.body.classList.toggle("dark-theme");
+            const theme = document.body.classList.contains("dark-theme") ? "Dark" : "Light";
+            document.getElementById("theme-toggle").innerText = `Switch to ${theme === "Dark" ? "Light" : "Dark"} Theme`;
+        }
+    </script>
+</body>
+</html>
