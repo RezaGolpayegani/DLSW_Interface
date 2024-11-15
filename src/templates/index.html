@@ -1,17 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Deep-Learning/Machine-Learning Parameter Tuner</title>
-    <!-- Link to CodeMirror's CSS and JS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/theme/dracula.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/python/python.min.js"></script>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+        <!-- Link both shortcut icon and regular icon for compatibility -->
+        <!-- <link rel="icon" href="/images/llama_icon.png" type="image/png">
+        <link rel="shortcut icon" href="/images/llama_icon.png" type="image/png"> -->
+        <link rel="icon" href="{{ url_for('static', filename='images/llama_icon.png') }}" type="image/png">
+        <link rel="shortcut icon" href="{{ url_for('static', filename='images/llama_icon.png') }}" type="image/png">
+
+        <!-- <img src="{{ url_for('static', filename='images/llama_icon.png') }}" alt="Llama Icon"> -->
+
+    
+        <title>Deep-Learning/Machine-Learning Parameter Tuner</title>
+        
+        <!-- Link to CodeMirror's CSS and JS -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/theme/dracula.min.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/python/python.min.js"></script>
+        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    </head>
+    
 <body class="dark-theme"> <!-- Apply dark theme by default -->
+    <!-- Logo container in the top-left corner -->
+    <div id="logo-container">
+        <img src="{{ url_for('static', filename='images/llama_icon.png') }}" alt="Llama Icon" id="logo">
+    </div>
+
+    <div id="theme-toggle-container">
+        <button id="theme-toggle" onclick="toggleTheme()">Switch to Light Theme</button>
+    </div>
     
     <div id="theme-toggle-container">
         <button id="theme-toggle" onclick="toggleTheme()">Switch to Light Theme</button> <!-- Button reflects dark theme currently active -->
