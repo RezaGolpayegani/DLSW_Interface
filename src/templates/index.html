@@ -43,17 +43,19 @@
         <!-- Code Snippet Input Section -->
         <div id="codebox">
             <h2>Code Snippet</h2>
-            <!-- Replace textarea with CodeMirror -->
             <textarea id="code-input" placeholder="Enter your Python code here..."></textarea>
             <button onclick="runCode()">Tune Parameters</button>
         </div>
-
+        
         <!-- Output Section -->
         <div id="output">
             <h2>Model Output</h2>
-            <pre id="output-content">Your output will appear here.</pre>
+            <textarea id="output-box" readonly></textarea> <!-- Output box as a CodeMirror-enabled textarea -->
+            <button onclick="Copy_output()">Copy to Clipboard</button>
         </div>
-
+        
+        
+        
         <!-- Chatbox Section -->
         <div id="chatbox">
             <h2>Chatbox</h2>
@@ -63,14 +65,15 @@
                 <label for="username">Enter your Username:</label>
                 <input type="text" id="username" placeholder="Your username" />
             </div>
-
+            
             <div id="chat-content"></div>
-
+            
             <!-- Chat Input and Send Button -->
             <input type="text" id="chat-input" placeholder="Type a message..." />
             <button onclick="sendMessage()">Send Message</button>
         </div>
     </div>
+</div>
 
     <script>
         // Initialize CodeMirror for Python code editing
@@ -109,27 +112,6 @@
             }
         }
 
-        // Run the code snippet and show output
-        // Run the code snippet and show output
-        async function runCode() {
-            const codeInputValue = codeInput.getValue().trim(); // Get value from CodeMirror
-            if (codeInputValue) {
-                const prompt = `Tune the parameters in this code:${codeInputValue}`;
-                try {
-                    const response = await fetch("/run_code", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ code: prompt })
-                    });
-                    const data = await response.json();
-                    document.getElementById("output-content").textContent = data.output;
-                } catch (error) {
-                    document.getElementById("output-content").textContent = `Error: ${error.message}`;
-                }
-            }
-        }
-
-
         // Theme toggle function
         function toggleTheme() {
             document.body.classList.toggle("dark-theme");
@@ -144,6 +126,76 @@
                 sendMessage(); // Call the sendMessage function
             }
         });
+        // Initialize CodeMirror for the output box
+        const outputBox = CodeMirror.fromTextArea(document.getElementById("output-box"), {
+            mode: "python",
+            theme: "dracula", // Same theme for consistency
+            lineNumbers: true,
+            matchBrackets: true,
+            readOnly: true, // Make it read-only
+            lineWrapping: true, // Wrap long lines
+            styleActiveLine: false // No need to highlight active line
+        });
+
+        // Run the code snippet and show output
+        async function runCode() {
+            const codeInputValue = codeInput.getValue().trim(); // Get value from CodeMirror
+            if (codeInputValue) {
+                const prompt = `Tune the parameters in this code:${codeInputValue}`;
+                try {
+                    const response = await fetch("/run_code", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ code: prompt })
+                    });
+                    const data = await response.json();
+                    outputBox.setValue(data.output); // Set the response output in the CodeMirror output box
+                } catch (error) {
+                    outputBox.setValue(`Error: ${error.message}`);
+                }
+            }
+        }
+
+        function Copy_output() {
+            // Get the output content from the CodeMirror instance (instead of using .value)
+            const outputContent = outputBox.getValue();
+            
+            // Create a temporary textarea element to copy the text
+            const tempTextArea = document.createElement("textarea");
+            tempTextArea.value = outputContent;
+            document.body.appendChild(tempTextArea);
+
+            // Select the content of the temporary textarea
+            tempTextArea.select();
+            tempTextArea.setSelectionRange(0, 99999); // For mobile devices
+            
+            try {
+                // Execute the copy command
+                const successful = navigator.clipboard.writeText(tempTextArea);
+                
+                // Feedback on success
+                if (successful) {
+                    const button = document.querySelector("#output button"); // Specifically target the button inside the output div
+                    button.textContent = "Copied to Clipboard";
+
+                    // Reset the button text after 3 seconds
+                    setTimeout(function() {
+                        button.textContent = "Copy to Clipboard";
+                    }, 3000);
+                } else {
+                    console.error("Failed to copy text.");
+                }
+            } catch (err) {
+                console.error("Error during copy: ", err);
+            }
+            
+            // Remove the temporary textarea from the DOM
+            document.body.removeChild(tempTextArea);
+        }
+
+
+
+
     </script>
 </body>
 </html>
